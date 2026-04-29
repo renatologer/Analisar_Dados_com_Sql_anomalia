@@ -377,7 +377,11 @@ JOIN olist_ecommerce.dbo.Olist_order_reviews_dataset r
 WHERE o.order_status = 'delivered'
 GROUP BY DATETRUNC(week, o.order_purchase_timestamp)
 ORDER BY semana;
-
+/*
+ * SCRIPT:O_Projeto_2.sql
+ * DESCRIÇÃO: Identificação de anomalias (picos/quedas) na receita usando STDEV.
+ * DATASET: Olist
+ */
 
 WITH kpis AS (
     SELECT
@@ -431,17 +435,21 @@ ORDER BY semana;
 
 
 
-
-
+/*
+ * SCRIPT: O_Projeto_2.sql
+ * DESCRIÇÃO:Usando as anomalias (picos/quedas) na receita usando STDEV.
+ * DATASET: Olist (2016-2018)
+ * TÉCNICA: Window Functions para Média Móvel (1 Preceding) e cálculo de Desvio Padrão.
+ */
 
 WITH kpis AS (
     SELECT
-        DATETRUNC(week, o.order_purchase_timestamp)      AS semana,
-        ROUND(SUM(oi.price + oi.freight_value), 2)       AS receita_total,
-        COUNT(DISTINCT o.order_id)                        AS total_pedidos,
+        DATETRUNC(week, o.order_purchase_timestamp) AS semana,
+        ROUND(SUM(oi.price + oi.freight_value), 2)  AS receita_total,
+        COUNT(DISTINCT o.order_id)                  AS total_pedidos,
         ROUND(SUM(oi.price + oi.freight_value) /
-              COUNT(DISTINCT o.order_id), 2)             AS ticket_medio,
-        ROUND(AVG(CAST(r.review_score AS FLOAT)), 2)     AS avaliacao_media
+              COUNT(DISTINCT o.order_id), 2)        AS ticket_medio,
+        ROUND(AVG(CAST(r.review_score AS FLOAT)), 2) AS avaliacao_media
     FROM olist_ecommerce.dbo.Olist_orders_dataset o
     JOIN olist_ecommerce.dbo.Olist_order_items_dataset oi
         ON o.order_id = oi.order_id
@@ -473,9 +481,9 @@ SELECT
     total_pedidos,
     ticket_medio,
     avaliacao_media,
-    ROUND(media_movel_receita, 2)                           AS media_movel,
-    ROUND(media_movel_receita + 1.5 * desvio_receita, 2)   AS limite_superior,
-    ROUND(media_movel_receita - 1.5 * desvio_receita, 2)   AS limite_inferior,
+    ROUND(media_movel_receita, 2) AS media_movel,
+    ROUND(media_movel_receita + 1.5 * desvio_receita, 2) AS limite_superior,
+    ROUND(media_movel_receita - 1.5 * desvio_receita, 2) AS limite_inferior,
     CASE
         WHEN receita_total > media_movel_receita + 1.5 * desvio_receita THEN 'ANOMALIA ALTA'
         WHEN receita_total < media_movel_receita - 1.5 * desvio_receita THEN 'ANOMALIA BAIXA'
@@ -483,7 +491,6 @@ SELECT
     END AS status_anomalia
 FROM anomalias
 ORDER BY semana;
-
 
 
 WITH kpis AS (
