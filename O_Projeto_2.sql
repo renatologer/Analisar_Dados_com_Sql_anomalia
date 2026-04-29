@@ -584,8 +584,3 @@ Técnicas utilizadas:
 → ROUND para precisão nos valores
 → WHERE filtrando apenas pedidos entregues
 
-Próximo passo: detecção de anomalias com média móvel e desvio padrão — tudo dentro do próprio SQL Server, sem Python.
-
-Se você também está estudando SQL ou Data Analytics, me conta nos comentários! 👇
-
-#SQL #SQLServer #DataAnalytics #Olist #DataAnalyst #Portfolio
